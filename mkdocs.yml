@@ -1,0 +1,109 @@
+site_name: Operations Research en Español
+site_description: Referencia técnica y práctica de Investigación de Operaciones — conceptos, algoritmos y código Python
+site_url: https://ninargue.github.io/operations-research-es/
+repo_url: https://github.com/ninargue/operations-research-es
+repo_name: ninargue/operations-research-es
+
+docs_dir: .
+site_dir: site
+
+exclude_docs: |
+  site/
+  **/*.py
+  requirements*.txt
+  .gitignore
+  banner.svg
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: es
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.details
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+
+nav:
+  - Inicio: README.md
+  - Determinísticos: 1_Deterministicos/README.md
+  - Estocásticos: 2_Estocasticos/README.md
+  - Híbridos:
+    - 3_Hibridos/README.md
+    - Programación Dinámica:
+      - 3_Hibridos/Programacion_Dinamica/README.md
+      - Fundamentos DP:
+        - 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/README.md
+        - Paradigma: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/paradigma.md
+        - Técnicas: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/tecnicas.md
+        - Recurrencia: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/recurrencia.md
+        - Clasificación: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/clasificacion.md
+      - Mochila 0/1:
+        - 3_Hibridos/Programacion_Dinamica/Mochila_0-1/README.md
+        - Fundamentos: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/fundamentos.md
+        - Formulación: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/formulacion.md
+        - Complejidad: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/complejidad.md
+        - Ejemplos: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/ejemplos.md
+      - Cambio de Monedas:
+        - 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/README.md
+        - Fundamentos: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/fundamentos.md
+        - Formulación: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/formulacion.md
+        - Complejidad: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/complejidad.md
+        - Ejemplos: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/ejemplos.md
+      - LCS:
+        - 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/README.md
+        - Fundamentos: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/fundamentos.md
+        - Formulación: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/formulacion.md
+        - Complejidad: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/complejidad.md
+        - Ejemplos: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/ejemplos.md
+      - Edit Distance:
+        - 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/README.md
+        - Fundamentos: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/fundamentos.md
+        - Formulación: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/formulacion.md
+        - Complejidad: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/complejidad.md
+        - Ejemplos: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/ejemplos.md
+      - Floyd-Warshall:
+        - Fundamentos: 3_Hibridos/Programacion_Dinamica/Caminos_Cortos_Floyd-Warshall/fundamentos.md
+        - Formulación: 3_Hibridos/Programacion_Dinamica/Caminos_Cortos_Floyd-Warshall/formulacion.md

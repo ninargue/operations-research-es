@@ -4,15 +4,8 @@ site_url: https://ninargue.github.io/operations-research-es/
 repo_url: https://github.com/ninargue/operations-research-es
 repo_name: ninargue/operations-research-es
 
-docs_dir: .
+docs_dir: docs
 site_dir: site
-
-exclude_docs: |
-  site/
-  **/*.py
-  requirements*.txt
-  .gitignore
-  banner.svg
 
 theme:
   name: material
@@ -67,39 +60,39 @@ extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
 
 nav:
-  - Inicio: README.md
-  - Determinísticos: 1_Deterministicos/README.md
-  - Estocásticos: 2_Estocasticos/README.md
+  - Inicio: index.md
+  - Determinísticos: 1_Deterministicos/index.md
+  - Estocásticos: 2_Estocasticos/index.md
   - Híbridos:
-    - 3_Hibridos/README.md
+    - 3_Hibridos/index.md
     - Programación Dinámica:
-      - 3_Hibridos/Programacion_Dinamica/README.md
+      - 3_Hibridos/Programacion_Dinamica/index.md
       - Fundamentos DP:
-        - 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/README.md
+        - 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/index.md
         - Paradigma: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/paradigma.md
         - Técnicas: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/tecnicas.md
         - Recurrencia: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/recurrencia.md
         - Clasificación: 3_Hibridos/Programacion_Dinamica/Fundamentos_DP/clasificacion.md
       - Mochila 0/1:
-        - 3_Hibridos/Programacion_Dinamica/Mochila_0-1/README.md
+        - 3_Hibridos/Programacion_Dinamica/Mochila_0-1/index.md
         - Fundamentos: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/fundamentos.md
         - Formulación: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/formulacion.md
         - Complejidad: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/complejidad.md
         - Ejemplos: 3_Hibridos/Programacion_Dinamica/Mochila_0-1/ejemplos.md
       - Cambio de Monedas:
-        - 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/README.md
+        - 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/index.md
         - Fundamentos: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/fundamentos.md
         - Formulación: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/formulacion.md
         - Complejidad: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/complejidad.md
         - Ejemplos: 3_Hibridos/Programacion_Dinamica/Cambio_Monedas/ejemplos.md
       - LCS:
-        - 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/README.md
+        - 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/index.md
         - Fundamentos: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/fundamentos.md
         - Formulación: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/formulacion.md
         - Complejidad: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/complejidad.md
         - Ejemplos: 3_Hibridos/Programacion_Dinamica/Subsecuencia_Comun_LCS/ejemplos.md
       - Edit Distance:
-        - 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/README.md
+        - 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/index.md
         - Fundamentos: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/fundamentos.md
         - Formulación: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/formulacion.md
         - Complejidad: 3_Hibridos/Programacion_Dinamica/Distancia_Edicion/complejidad.md

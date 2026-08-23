@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizador - Programación Dinámica (Mochila 0/1)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.5rem; color: #2c3e50; }
+        p { font-size: 0.8rem; color: #095bad; font-weight: bold; }
+        .controls { margin-bottom: 20px; padding: 10px; background: #ecf0f1; border-radius: 6px; }
+        button { background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;}
+        button:hover { background: #2980b9; }
+        button:disabled { background: #bdc3c7; cursor: not-allowed; }
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; text-align: center; }
+        th, td { border: 1px solid #bdc3c7; padding: 8px 6px; min-width: 90px; min-height: 60px; transition: all 0.3s ease; vertical-align: middle; }
+        th { background-color: #34495e; color: white; font-size: 0.9rem; }
+        .header-item { background-color: #7f8c8d; color: white; font-size: 0.8rem; }
+        .cell-value { display: block; font-size: 1rem; font-weight: bold; }
+        .cell-item { display: block; font-size: 0.65rem; margin-top: 3px; line-height: 1.4; }
+        .cell-item.taken { color: #1a7a4a; }
+        .cell-item.not-taken { color: #c0392b; }
+
+        /* Clases de estado visual */
+        .cell-current { background-color: #3498db; color: white; font-weight: bold; transform: scale(1.05); }
+        .cell-current .cell-item.taken { color: #d5f5e3; }
+        .cell-current .cell-item.not-taken { color: #fde8e6; }
+        .cell-dependency { background-color: #f1c40f; color: black; font-weight: bold; }
+        .cell-path { background-color: #2ecc71; color: white; font-weight: bold; border: 2px solid #27ae60; }
+        .cell-path .cell-item.taken { color: #d5f5e3; }
+        .cell-path .cell-item.not-taken { color: #fde8e6; }
+        
+        #status { margin-top: 15px; font-weight: bold; color: #e74c3c; min-height: 20px;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simulador  Matriz DP de la Mochila</h1>
+    <p>Capacidad máxima de la mochila: 6 m³ - Número de ítems: 3</p>
+    <p>Donde: v = valor del ítem ($), w = volumen del ítem (m³)</p>
+    <div class="controls">
+        <button id="btn-step" onclick="siguientePaso()">Siguiente Paso</button>
+        <button id="btn-solve" onclick="resolverTodo()">Resolver Todo</button>
+        <button id="btn-reset" onclick="inicializar()">Reiniciar</button>
+    </div>
+    
+    <div id="status">Haz clic en "Siguiente Paso" para comenzar a calcular.</div>
+    <div id="hint" style="font-size:0.75rem; color:#7f8c8d; margin-top:4px; min-height:16px;"></div>
+    <table id="dp-table"></table>
+</div>
+
+<script>
+    // 1. Datos de la Instancia (Aplicación Logística)
+    const items = [
+        { nombre: "Lote A", v: 5, w: 4 },
+        { nombre: "Lote B", v: 3, w: 2 },
+        { nombre: "Lote C", v: 4, w: 3 }
+    ];
+    const capacidadMax = 6;
+    const n = items.length;
+    
+    let dp = [];
+    let taken = [];
+    let currI = 1;
+    let currW = 1;
+    let finalizado = false;
+
+    // 2. Inicialización del DOM y la Matriz
+    function inicializar() {
+        currI = 1; currW = 1; finalizado = false;
+        document.getElementById('status').innerText = "Haz clic en 'Siguiente Paso' para comenzar a calcular.";
+        document.getElementById('hint').innerText = '';
+        document.getElementById('btn-step').disabled = false;
+        document.getElementById('btn-solve').disabled = false;
+        
+        const table = document.getElementById('dp-table');
+        table.innerHTML = '';
+        dp = Array(n + 1).fill().map(() => Array(capacidadMax + 1).fill(0));
+        taken = Array(n + 1).fill().map(() => Array(capacidadMax + 1).fill(false));
+
+        // Construir tabla HTML
+        // Fila de encabezados (Capacidades)
+        let headerRow = '<tr><th>Items \\ Capacidad</th>';
+        for(let w = 0; w <= capacidadMax; w++) headerRow += `<th>${w} m³</th>`;
+        headerRow += '</tr>';
+        table.innerHTML += headerRow;
+
+        // Filas de datos
+        for(let i = 0; i <= n; i++) {
+            let row = `<tr>`;
+            if (i === 0) {
+                row += `<td class="header-item">0 Objetos</td>`;
+            } else {
+                row += `<td class="header-item">${items[i-1].nombre} (v:${items[i-1].v}, w:${items[i-1].w})</td>`;
+            }
+            
+            for(let w = 0; w <= capacidadMax; w++) {
+                // La fila 0 y columna 0 son casos base (0)
+                row += `<td id="cell-${i}-${w}">${dp[i][w]}</td>`;
+            }
+            row += `</tr>`;
+            table.innerHTML += row;
+        }
+    }
+
+    function renderCeldaContenido(i, w) {
+        if (i === 0 || w === 0) return `<span class="cell-value">${dp[i][w]}</span>`;
+        const item = items[i - 1];
+        const tomado = taken[i][w];
+        const icono = tomado ? '✓' : '✗';
+        const clase = tomado ? 'taken' : 'not-taken';
+        return `<span class="cell-value">${dp[i][w]}</span><span class="cell-item ${clase}">${icono} ${item.nombre} · ${item.w}m³</span>`;
+    }
+
+    // Limpiar estilos previos
+    function limpiarEstilos() {
+        const celdas = document.querySelectorAll('td');
+        celdas.forEach(c => {
+            c.classList.remove('cell-current', 'cell-dependency');
+        });
+    }
+
+    // 3. Lógica del Algoritmo (Paso a Paso)
+    function siguientePaso() {
+        if (finalizado) return;
+        limpiarEstilos();
+
+        if (currI > n) {
+            iniciarBacktracking();
+            return;
+        }
+
+        let item = items[currI - 1];
+        let valorSinItem = dp[currI - 1][currW];
+        let celdaDOM = document.getElementById(`cell-${currI}-${currW}`);
+        let statusDiv = document.getElementById('status');
+
+        document.getElementById(`cell-${currI - 1}-${currW}`).classList.add('cell-dependency'); // Dependencia vertical
+
+        if (item.w <= currW) {
+            let valorConItem = item.v + dp[currI - 1][currW - item.w];
+            dp[currI][currW] = Math.max(valorSinItem, valorConItem);
+            taken[currI][currW] = valorConItem >= valorSinItem;
+
+            document.getElementById(`cell-${currI - 1}-${currW - item.w}`).classList.add('cell-dependency'); // Dependencia diagonal
+            const dpRestante = dp[currI - 1][currW - item.w];
+            statusDiv.innerText = `${item.nombre} · cap.${currW}m³ → MAX( actual: $${valorSinItem} | incluir: $${item.v} + dp[cap.${currW}−${item.w}=${currW - item.w}m³]: $${dpRestante} = $${valorConItem} ) = $${dp[currI][currW]}`;
+            document.getElementById('hint').innerText = 'actual hereda el valor de la fila anterior; incluir suma el valor del ítem al mejor resultado con la capacidad restante';
+        } else {
+            dp[currI][currW] = valorSinItem;
+            taken[currI][currW] = false;
+            statusDiv.innerText = `${item.nombre} (w:${item.w}m³) no cabe en cap.${currW}m³ → hereda $${valorSinItem} de la fila anterior`;
+            document.getElementById('hint').innerText = '';
+        }
+
+        celdaDOM.innerHTML = renderCeldaContenido(currI, currW);
+        celdaDOM.classList.add('cell-current');
+
+        // Avanzar punteros
+        currW++;
+        if (currW > capacidadMax) {
+            currW = 1;
+            currI++;
+        }
+    }
+
+    function resolverTodo() {
+        while (!finalizado) {
+            siguientePaso();
+        }
+    }
+
+    // 4. Reconstrucción de la Solución (Backtracking)
+    function iniciarBacktracking() {
+        finalizado = true;
+        limpiarEstilos();
+        document.getElementById('btn-step').disabled = true;
+        document.getElementById('btn-solve').disabled = true;
+        
+        let w = capacidadMax;
+        let valorTotal = dp[n][w];
+        let lotesElegidos = [];
+        
+        for (let i = n; i > 0; i--) {
+            document.getElementById(`cell-${i}-${w}`).classList.add('cell-path');
+            if (dp[i][w] !== dp[i - 1][w]) {
+                lotesElegidos.push(items[i - 1].nombre);
+                w -= items[i - 1].w;
+            }
+        }
+        // Resaltar el caso base final del path
+        document.getElementById(`cell-0-${w}`).classList.add('cell-path');
+
+        document.getElementById('status').innerHTML = `<strong>¡Cálculo Finalizado!</strong><br>Rentabilidad Máxima: $${valorTotal}<br>Lotes Seleccionados: ${lotesElegidos.reverse().join(', ')}`;
+        document.getElementById('hint').innerText = '';
+        document.getElementById('status').style.color = '#27ae60';
+    }
+
+    // Ejecutar al cargar la página
+    window.onload = inicializar;
+</script>
+</body>
+</html>

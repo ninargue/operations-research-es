@@ -10,7 +10,7 @@ Los modelos híbridos combinan elementos determinísticos y estocásticos, o int
 | [PERT / CPM](./PERT_CPM/) | Planificación y control de proyectos mediante redes de actividades |
 | [Simulación](./Simulacion/) | Modelado computacional de sistemas complejos (Monte Carlo, eventos discretos) |
 | [Programación Heurística](./Programacion_Heuristica/) | Algoritmos de búsqueda aproximada: genéticos, recocido simulado, tabú |
-| [Programación Dinámica](./Programacion_Dinamica/) | Descomposición de problemas en subproblemas mediante principio de optimalidad |
+| [Programación Dinámica](./Programacion_Dinamica/) | Descomposición de problemas en subproblemas mediante principio de optimalidad — incluye marco teórico general (paradigma, técnicas, recurrencias) y cinco problemas clásicos: Mochila 0/1, Cambio de Monedas, LCS, Edit Distance, Floyd-Warshall |
 
 ## Aplicaciones por Sector
 

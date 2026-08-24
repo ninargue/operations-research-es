@@ -1,0 +1,74 @@
+site_name: Operations Research en Español
+site_description: Referencia técnica y práctica de Investigación de Operaciones — conceptos, algoritmos y código Python
+site_url: https://ninargue.github.io/operations-research-es/
+repo_url: https://github.com/ninargue/operations-research-es
+repo_name: ninargue/operations-research-es
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: es
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.details
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+
+nav:
+  - Inicio: index.md
+  - Determinísticos:
+    - 1_Deterministicos/index.md
+    - Programación Lineal Binaria:
+      - 1_Deterministicos/Lineal/Programacion_Lineal/Binaria/index.md
+      - Balanceo de Línea:
+        - 1_Deterministicos/Lineal/Programacion_Lineal/Binaria/Balanceo_de_Linea/index.md
+        - Fundamentos: 1_Deterministicos/Lineal/Programacion_Lineal/Binaria/Balanceo_de_Linea/fundamentos.md
+        - Formulación: 1_Deterministicos/Lineal/Programacion_Lineal/Binaria/Balanceo_de_Linea/formulacion.md
+        - Ejemplos: 1_Deterministicos/Lineal/Programacion_Lineal/Binaria/Balanceo_de_Linea/ejemplos.md
+  - Estocásticos: 2_Estocasticos/index.md
+  - Híbridos: 3_Hibridos/index.md

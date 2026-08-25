@@ -27,3 +27,6 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+
+# MkDocs
+site/

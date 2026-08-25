@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizador - Programación Dinámica (Distancia de Edición)</title>
+  <style>
+    :root {
+      --bg: #f5f6fa;
+      --surface: #ffffff;
+      --border: #d1d5db;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --primary: #2c3e50;
+      --btn-bg: #2c3e50;
+      --btn-hover: #34495e;
+      --btn-text: #ffffff;
+      --reset-bg: #7f8c8d;
+      --reset-hover: #95a5a6;
+
+      --cell-default: #ffffff;
+      --cell-header: #ecf0f1;
+      --cell-active: #3498db;
+      --cell-dep: #f1c40f;
+      --cell-match: #2ecc71;
+      --cell-min: #e67e22;
+      --cell-path-match: #3498db;
+      --cell-path-sub: #f39c12;
+      --cell-path-del: #e74c3c;
+      --cell-path-ins: #2ecc71;
+      --cell-text-contrast: #ffffff;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--primary);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* --- Panel superior --- */
+    .top-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .string-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .string-val {
+      font-family: 'Courier New', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 2px;
+    }
+
+    /* --- Botones --- */
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    #btnStep   { background: var(--btn-bg);   color: var(--btn-text); }
+    #btnStep:hover   { background: var(--btn-hover); }
+    #btnAll    { background: #27ae60;          color: #fff; }
+    #btnAll:hover    { background: #2ecc71; }
+    #btnReset  { background: var(--reset-bg); color: #fff; }
+    #btnReset:hover  { background: var(--reset-hover); }
+
+    button:disabled { opacity: 0.4; cursor: default; }
+
+    /* --- Status bar --- */
+    #status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 9px 14px;
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+      min-height: 38px;
+      color: var(--text-muted);
+    }
+
+    /* --- Tabla DP --- */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    td, th {
+      width: 42px;
+      height: 42px;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: background 0.18s, color 0.18s;
+    }
+
+    th {
+      background: var(--cell-header);
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+    }
+
+    td { background: var(--cell-default); position: relative; }
+
+    td.active   { background: var(--cell-active) !important; color: var(--cell-text-contrast) !important; }
+    td.dep      { background: var(--cell-dep) !important; color: #333 !important; }
+    td.match-diag { background: var(--cell-match) !important; color: var(--cell-text-contrast) !important; }
+    td.min-op   { background: var(--cell-min) !important; color: var(--cell-text-contrast) !important; }
+
+    td.path-match { background: var(--cell-path-match) !important; color: var(--cell-text-contrast) !important; }
+    td.path-sub   { background: var(--cell-path-sub) !important; color: var(--cell-text-contrast) !important; }
+    td.path-del   { background: var(--cell-path-del) !important; color: var(--cell-text-contrast) !important; }
+    td.path-ins   { background: var(--cell-path-ins) !important; color: var(--cell-text-contrast) !important; }
+
+    /* --- Panel lateral --- */
+    .side-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .side-panel h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    #editScript {
+      list-style: none;
+      font-size: 0.83rem;
+    }
+
+    #editScript li {
+      padding: 5px 8px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .op-sub  { background: #fef3cd; color: #856404; }
+    .op-del  { background: #f8d7da; color: #842029; }
+    .op-ins  { background: #d1e7dd; color: #0a3622; }
+    .op-match { background: #cfe2ff; color: #084298; }
+
+    /* --- Leyenda --- */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 0.78rem;
+    }
+
+    .leg-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .leg-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    #resultMsg {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 10px;
+      color: var(--primary);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Visualizador — Programación Dinámica (Distancia de Edición)</h1>
+
+<div class="layout">
+  <div>
+    <!-- Panel superior -->
+    <div class="top-panel">
+      <div>
+        <div class="string-label">Cadena fuente (src)</div>
+        <div class="string-val" id="srcDisplay"></div>
+      </div>
+      <div>
+        <div class="string-label">Cadena destino (dst)</div>
+        <div class="string-val" id="dstDisplay"></div>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="btn-row">
+      <button id="btnStep">Siguiente Paso</button>
+      <button id="btnAll">Resolver Todo</button>
+      <button id="btnReset">Reiniciar</button>
+    </div>
+
+    <!-- Status bar -->
+    <div id="status">Presiona "Siguiente Paso" para comenzar.</div>
+
+    <!-- Tabla DP -->
+    <div class="table-wrap">
+      <table id="dpTable"></table>
+    </div>
+
+    <!-- Resultado final -->
+    <div id="resultMsg"></div>
+
+    <!-- Leyenda -->
+    <div class="legend">
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-active)"></div> Celda activa</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-dep)"></div> Dependencias</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-match)"></div> Match (diagonal)</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-min)"></div> Mínimo elegido</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-path-match)"></div> Ruta: sin cambio</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-path-sub)"></div> Ruta: sustitución</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-path-del)"></div> Ruta: eliminación</div>
+      <div class="leg-item"><div class="leg-box" style="background:var(--cell-path-ins)"></div> Ruta: inserción</div>
+    </div>
+  </div>
+
+  <!-- Panel lateral -->
+  <div class="side-panel">
+    <h2>Edit Script</h2>
+    <ul id="editScript"><li style="color:var(--text-muted);font-size:0.82rem;">Aparecerá al finalizar.</li></ul>
+  </div>
+</div>
+
+<script>
+(function () {
+  // -------------------------------------------------------------------------
+  // Datos
+  // -------------------------------------------------------------------------
+  const src = "kitten";
+  const dst = "sitting";
+  const m = src.length;
+  const n = dst.length;
+
+  document.getElementById("srcDisplay").textContent = src;
+  document.getElementById("dstDisplay").textContent = dst;
+
+  // -------------------------------------------------------------------------
+  // Estado
+  // -------------------------------------------------------------------------
+  let dp = [];
+  let op = [];
+  let stepQueue = [];  // lista de (i,j) a procesar en orden
+  let stepIdx = 0;
+  let finished = false;
+
+  function init() {
+    dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(null));
+    op = Array.from({ length: m + 1 }, () => Array(n + 1).fill(""));
+
+    for (let i = 0; i <= m; i++) { dp[i][0] = i; op[i][0] = "D"; }
+    for (let j = 0; j <= n; j++) { dp[0][j] = j; op[0][j] = "I"; }
+    op[0][0] = "";
+
+    // Rellenar cola de pasos: solo celdas (i>0, j>0)
+    stepQueue = [];
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        stepQueue.push([i, j]);
+      }
+    }
+    stepIdx = 0;
+    finished = false;
+
+    document.getElementById("status").textContent = "Presiona \"Siguiente Paso\" para comenzar.";
+    document.getElementById("resultMsg").style.display = "none";
+    document.getElementById("editScript").innerHTML = "<li style=\"color:var(--text-muted);font-size:0.82rem;\">Aparecerá al finalizar.</li>";
+    document.getElementById("btnStep").disabled = false;
+    document.getElementById("btnAll").disabled = false;
+
+    buildTable();
+  }
+
+  // -------------------------------------------------------------------------
+  // Construcción de la tabla HTML
+  // -------------------------------------------------------------------------
+  function buildTable() {
+    const tbl = document.getElementById("dpTable");
+    tbl.innerHTML = "";
+
+    // Fila de encabezado de dst
+    const headRow = tbl.insertRow();
+    headRow.insertCell().textContent = "";  // esquina vacía
+    headRow.insertCell().textContent = "";  // columna j=0 sin char
+    for (let j = 0; j < n; j++) {
+      const th = document.createElement("th");
+      th.textContent = dst[j];
+      headRow.appendChild(th);
+    }
+
+    // Filas de src
+    for (let i = 0; i <= m; i++) {
+      const row = tbl.insertRow();
+      // Etiqueta de fila (carácter de src)
+      const labelCell = document.createElement("th");
+      labelCell.textContent = i === 0 ? "" : src[i - 1];
+      row.appendChild(labelCell);
+
+      for (let j = 0; j <= n; j++) {
+        const cell = row.insertCell();
+        cell.id = `c${i}_${j}`;
+        cell.textContent = dp[i][j] !== null ? dp[i][j] : "";
+      }
+    }
+  }
+
+  function cellEl(i, j) {
+    return document.getElementById(`c${i}_${j}`);
+  }
+
+  function clearHighlights() {
+    for (let i = 0; i <= m; i++) {
+      for (let j = 0; j <= n; j++) {
+        const el = cellEl(i, j);
+        if (el) el.className = "";
+      }
+    }
+  }
+
+  function refreshValues() {
+    for (let i = 0; i <= m; i++) {
+      for (let j = 0; j <= n; j++) {
+        const el = cellEl(i, j);
+        if (el && dp[i][j] !== null) el.textContent = dp[i][j];
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Un paso de la DP
+  // -------------------------------------------------------------------------
+  function doStep() {
+    if (stepIdx >= stepQueue.length) {
+      if (!finished) finalize();
+      return;
+    }
+
+    clearHighlights();
+
+    const [i, j] = stepQueue[stepIdx];
+
+    // Calcular valor
+    let val, oper, statusMsg;
+    if (src[i - 1] === dst[j - 1]) {
+      val = dp[i - 1][j - 1];
+      oper = "M";
+      statusMsg = `dp[${i}][${j}]: '${src[i-1]}' = '${dst[j-1]}' → match. Valor = dp[${i-1}][${j-1}] = ${val}.`;
+    } else {
+      const del = dp[i - 1][j] + 1;
+      const ins = dp[i][j - 1] + 1;
+      const sub = dp[i - 1][j - 1] + 1;
+      val = Math.min(del, ins, sub);
+      if (val === sub)      { oper = "S"; }
+      else if (val === del) { oper = "D"; }
+      else                  { oper = "I"; }
+      const opName = oper === "S" ? "sustitución" : oper === "D" ? "eliminación" : "inserción";
+      statusMsg = `dp[${i}][${j}]: '${src[i-1]}' ≠ '${dst[j-1]}'. del=${del}, ins=${ins}, sub=${sub}. Mínimo=${val} (${opName}).`;
+    }
+
+    dp[i][j] = val;
+    op[i][j] = oper;
+    refreshValues();
+
+    // Resaltar dependencias
+    cellEl(i - 1, j).classList.add("dep");      // eliminación
+    cellEl(i, j - 1).classList.add("dep");      // inserción
+    if (oper === "M") {
+      cellEl(i - 1, j - 1).classList.add("match-diag");
+    } else {
+      cellEl(i - 1, j - 1).classList.add("dep");
+      // Resaltar la dependencia mínima elegida
+      if (oper === "S") cellEl(i - 1, j - 1).classList.add("min-op");
+      else if (oper === "D") cellEl(i - 1, j).classList.add("min-op");
+      else                   cellEl(i, j - 1).classList.add("min-op");
+    }
+
+    // Resaltar celda activa
+    cellEl(i, j).classList.add("active");
+
+    document.getElementById("status").textContent = statusMsg;
+
+    stepIdx++;
+    if (stepIdx >= stepQueue.length) {
+      finalize();
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Resolver todo de una vez
+  // -------------------------------------------------------------------------
+  function doAll() {
+    while (stepIdx < stepQueue.length) {
+      const [i, j] = stepQueue[stepIdx];
+      let val, oper;
+      if (src[i - 1] === dst[j - 1]) {
+        val = dp[i - 1][j - 1]; oper = "M";
+      } else {
+        const del = dp[i - 1][j] + 1;
+        const ins = dp[i][j - 1] + 1;
+        const sub = dp[i - 1][j - 1] + 1;
+        val = Math.min(del, ins, sub);
+        if (val === sub) oper = "S";
+        else if (val === del) oper = "D";
+        else oper = "I";
+      }
+      dp[i][j] = val;
+      op[i][j] = oper;
+      stepIdx++;
+    }
+    refreshValues();
+    clearHighlights();
+    finalize();
+  }
+
+  // -------------------------------------------------------------------------
+  // Finalizar: backtracking y edit script
+  // -------------------------------------------------------------------------
+  function finalize() {
+    finished = true;
+    document.getElementById("btnStep").disabled = true;
+    document.getElementById("btnAll").disabled = true;
+
+    // Backtracking
+    const path = [];
+    let i = m, j = n;
+    while (i > 0 || j > 0) {
+      const oper = op[i][j];
+      path.push([i, j, oper]);
+      if (oper === "M" || oper === "S") { i--; j--; }
+      else if (oper === "D") { if (i > 0) i--; else j--; }
+      else { // "I"
+        if (j > 0) j--; else i--;
+      }
+    }
+    path.push([0, 0, ""]);
+    path.reverse();
+
+    // Colorear ruta
+    clearHighlights();
+    for (const [pi, pj, oper] of path) {
+      const el = cellEl(pi, pj);
+      if (!el) continue;
+      if (oper === "M")      el.classList.add("path-match");
+      else if (oper === "S") el.classList.add("path-sub");
+      else if (oper === "D") el.classList.add("path-del");
+      else if (oper === "I") el.classList.add("path-ins");
+    }
+
+    // Construir edit script (orden correcto)
+    const script = [];
+    for (let k = 1; k < path.length; k++) {
+      const [pi, pj, oper] = path[k];
+      if (oper === "M") {
+        script.push({ tipo: "M", texto: `Sin cambio: '${src[pi-1]}' (pos ${pi})` });
+      } else if (oper === "S") {
+        script.push({ tipo: "S", texto: `Sustituir: '${src[pi-1]}' → '${dst[pj-1]}' (pos ${pi})` });
+      } else if (oper === "D" && pi > 0) {
+        script.push({ tipo: "D", texto: `Eliminar: '${src[pi-1]}' (pos ${pi})` });
+      } else if (oper === "I" && pj > 0) {
+        script.push({ tipo: "I", texto: `Insertar: '${dst[pj-1]}' (pos ${pj})` });
+      }
+    }
+
+    const ul = document.getElementById("editScript");
+    ul.innerHTML = "";
+    let opCount = 0;
+    for (const s of script) {
+      const li = document.createElement("li");
+      li.textContent = s.texto;
+      if (s.tipo === "M")      li.className = "op-match";
+      else if (s.tipo === "S") { li.className = "op-sub";  opCount++; }
+      else if (s.tipo === "D") { li.className = "op-del";  opCount++; }
+      else if (s.tipo === "I") { li.className = "op-ins";  opCount++; }
+      ul.appendChild(li);
+    }
+
+    document.getElementById("status").textContent =
+      `Completado. Distancia de edición: ${dp[m][n]}. Operaciones de costo: ${opCount}.`;
+
+    const res = document.getElementById("resultMsg");
+    res.textContent = `Distancia de edición: ${dp[m][n]}`;
+    res.style.display = "block";
+  }
+
+  // -------------------------------------------------------------------------
+  // Eventos
+  // -------------------------------------------------------------------------
+  document.getElementById("btnStep").addEventListener("click", doStep);
+  document.getElementById("btnAll").addEventListener("click", doAll);
+  document.getElementById("btnReset").addEventListener("click", init);
+
+  init();
+})();
+</script>
+</body>
+</html>

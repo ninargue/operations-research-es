@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizador - Programación Dinámica (Cambio de Monedas)</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 20px; }
+        .container { max-width: 960px; margin: 0 auto; background: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { font-size: 1.4rem; color: #2c3e50; margin-bottom: 4px; }
+        .subtitle { font-size: 0.85rem; color: #095bad; font-weight: bold; margin: 0 0 16px 0; }
+        .controls { margin-bottom: 16px; padding: 10px 12px; background: #ecf0f1; border-radius: 6px; }
+        button { background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+        button:hover { background: #2980b9; }
+        button:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        /* Vector table — horizontal layout */
+        .vector-wrap { overflow-x: auto; margin-top: 20px; }
+        table { border-collapse: collapse; text-align: center; min-width: 100%; }
+        th, td { border: 1px solid #bdc3c7; padding: 10px 8px; min-width: 56px; transition: background-color 0.25s ease, color 0.25s ease; vertical-align: middle; }
+        .row-label { background-color: #34495e; color: white; font-size: 0.85rem; font-weight: bold; text-align: left; padding: 10px 14px; white-space: nowrap; }
+        .cell-idx { background-color: #7f8c8d; color: white; font-size: 0.9rem; font-weight: bold; }
+
+        /* Value / denomination cells */
+        .cell-val { font-size: 1.05rem; font-weight: bold; }
+        .cell-mon { font-size: 0.8rem; color: #555; }
+
+        /* State colors */
+        .cell-active   { background-color: #3498db; color: white; }
+        .cell-winner   { background-color: #2ecc71; color: white; }
+        .cell-other    { background-color: #e67e22; color: white; }
+        .cell-path     { background-color: #2ecc71; color: white; border: 2px solid #27ae60; }
+
+        /* Status bar */
+        #status { margin-top: 14px; font-weight: bold; color: #e74c3c; min-height: 44px; font-size: 0.9rem; line-height: 1.5; }
+        #hint   { font-size: 0.75rem; color: #7f8c8d; margin-top: 4px; min-height: 16px; }
+
+        /* Legend */
+        .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; font-size: 0.8rem; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Visualizador — Vector DP del Cambio de Monedas</h1>
+    <p class="subtitle">Denominaciones: {1, 5, 6} &nbsp;|&nbsp; Monto objetivo: 11</p>
+
+    <div class="controls">
+        <button id="btn-step"  onclick="siguientePaso()">Siguiente Paso</button>
+        <button id="btn-solve" onclick="resolverTodo()">Resolver Todo</button>
+        <button id="btn-reset" onclick="inicializar()">Reiniciar</button>
+    </div>
+
+    <div id="status">Haz clic en "Siguiente Paso" para comenzar a calcular.</div>
+    <div id="hint"></div>
+
+    <div class="vector-wrap">
+        <table id="dp-table"></table>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#3498db;"></div> Celda activa dp[c]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2ecc71;"></div> Dependencia ganadora dp[c−d*]</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e67e22;"></div> Dependencias evaluadas (no elegidas)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2ecc71; border:2px solid #27ae60;"></div> Camino óptimo (backtracking)</div>
+    </div>
+</div>
+
+<script>
+    // -----------------------------------------------------------------------
+    // Datos del problema
+    // -----------------------------------------------------------------------
+    const DENOMINACIONES = [1, 5, 6];
+    const MONTO = 11;
+    const INF = Infinity;
+
+    // Estado del algoritmo
+    let dp = [];
+    let monedaUsada = [];
+    let currC = 1;
+    let finalizado = false;
+
+    // -----------------------------------------------------------------------
+    // Construccion inicial de la tabla HTML
+    // -----------------------------------------------------------------------
+    function inicializar() {
+        currC = 1;
+        finalizado = false;
+
+        dp = new Array(MONTO + 1).fill(INF);
+        dp[0] = 0;
+        monedaUsada = new Array(MONTO + 1).fill(-1);
+
+        document.getElementById('btn-step').disabled = false;
+        document.getElementById('btn-solve').disabled = false;
+        document.getElementById('status').innerText = "Haz clic en \"Siguiente Paso\" para comenzar a calcular.";
+        document.getElementById('status').style.color = '#e74c3c';
+        document.getElementById('hint').innerText = '';
+
+        const tabla = document.getElementById('dp-table');
+        tabla.innerHTML = '';
+
+        // Fila de indices
+        let filaIdx = '<tr><th class="row-label">c</th>';
+        for (let c = 0; c <= MONTO; c++) {
+            filaIdx += `<td class="cell-idx">${c}</td>`;
+        }
+        filaIdx += '</tr>';
+
+        // Fila de valores dp[c]
+        let filaVal = '<tr><th class="row-label">dp[c]</th>';
+        for (let c = 0; c <= MONTO; c++) {
+            const val = c === 0 ? '0' : '&infin;';
+            filaVal += `<td class="cell-val" id="val-${c}">${val}</td>`;
+        }
+        filaVal += '</tr>';
+
+        // Fila de moneda usada
+        let filaMon = '<tr><th class="row-label">moneda usada</th>';
+        for (let c = 0; c <= MONTO; c++) {
+            filaMon += `<td class="cell-mon" id="mon-${c}">—</td>`;
+        }
+        filaMon += '</tr>';
+
+        tabla.innerHTML = filaIdx + filaVal + filaMon;
+    }
+
+    // -----------------------------------------------------------------------
+    // Limpiar resaltados visuales
+    // -----------------------------------------------------------------------
+    function limpiarEstilos() {
+        for (let c = 0; c <= MONTO; c++) {
+            const vCell = document.getElementById(`val-${c}`);
+            if (vCell) {
+                vCell.classList.remove('cell-active', 'cell-winner', 'cell-other', 'cell-path');
+            }
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Siguiente paso: calcular dp[currC]
+    // -----------------------------------------------------------------------
+    function siguientePaso() {
+        if (finalizado) return;
+
+        if (currC > MONTO) {
+            iniciarBacktracking();
+            return;
+        }
+
+        limpiarEstilos();
+
+        // Evaluar todas las denominaciones validas para el monto currC
+        let mejorVal = INF;
+        let mejorD   = -1;
+        const candidatos = [];
+
+        for (const d of DENOMINACIONES) {
+            if (d <= currC) {
+                const sub = dp[currC - d];
+                const candidato = sub === INF ? INF : sub + 1;
+                candidatos.push({ d, sub, candidato });
+                if (candidato < mejorVal) {
+                    mejorVal = candidato;
+                    mejorD   = d;
+                }
+            }
+        }
+
+        // Actualizar estado DP
+        dp[currC]         = mejorVal;
+        monedaUsada[currC] = mejorD;
+
+        // Actualizar celda de valor
+        const valStr = mejorVal === INF ? '&infin;' : mejorVal;
+        document.getElementById(`val-${currC}`).innerHTML = valStr;
+        document.getElementById(`mon-${currC}`).innerText = mejorD === -1 ? '—' : mejorD;
+
+        // Colorear celda activa
+        document.getElementById(`val-${currC}`).classList.add('cell-active');
+
+        // Colorear dependencias
+        for (const { d, sub, candidato } of candidatos) {
+            const depCell = document.getElementById(`val-${currC - d}`);
+            if (d === mejorD) {
+                depCell.classList.add('cell-winner');
+            } else {
+                depCell.classList.add('cell-other');
+            }
+        }
+
+        // Construir texto de la barra de estado
+        const partes = candidatos.map(({ d, sub, candidato }) => {
+            const subStr = sub === INF ? '&infin;' : sub;
+            const canStr = candidato === INF ? '&infin;' : candidato;
+            return `1+dp[${currC - d}]=${canStr}`;
+        });
+        const valFinal = mejorVal === INF ? '&infin;' : mejorVal;
+
+        document.getElementById('status').innerHTML =
+            `dp[${currC}] = min(${partes.join(', ')}) &rarr; elegida: d=${mejorD}, dp[${currC}]=${valFinal}`;
+        document.getElementById('hint').innerText =
+            'La celda verde muestra la dependencia dp[c−d] que produce el minimo; las naranjas son las descartadas.';
+
+        currC++;
+    }
+
+    // -----------------------------------------------------------------------
+    // Resolver todo en un solo clic
+    // -----------------------------------------------------------------------
+    function resolverTodo() {
+        while (!finalizado) {
+            siguientePaso();
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Backtracking: resaltar el camino optimo
+    // -----------------------------------------------------------------------
+    function iniciarBacktracking() {
+        finalizado = true;
+        limpiarEstilos();
+        document.getElementById('btn-step').disabled  = true;
+        document.getElementById('btn-solve').disabled = true;
+
+        // Reconstruir camino
+        const monedas = [];
+        let c = MONTO;
+        while (c > 0) {
+            const d = monedaUsada[c];
+            monedas.push(d);
+            document.getElementById(`val-${c}`).classList.add('cell-path');
+            document.getElementById(`mon-${c}`).style.fontWeight = 'bold';
+            c -= d;
+        }
+        document.getElementById(`val-0`).classList.add('cell-path');
+
+        monedas.sort((a, b) => b - a);
+        const totalMonedas = dp[MONTO];
+
+        document.getElementById('status').innerHTML =
+            `<strong>Calculo finalizado.</strong><br>` +
+            `Monedas seleccionadas: ${monedas.join(' + ')} = ${MONTO} &nbsp;&mdash;&nbsp; ` +
+            `Total: <strong>${totalMonedas} monedas</strong>`;
+        document.getElementById('status').style.color = '#27ae60';
+        document.getElementById('hint').innerText = 'Las celdas verdes marcan el camino optimo reconstruido por backtracking.';
+    }
+
+    // -----------------------------------------------------------------------
+    // Inicializar al cargar la pagina
+    // -----------------------------------------------------------------------
+    window.onload = inicializar;
+</script>
+</body>
+</html>

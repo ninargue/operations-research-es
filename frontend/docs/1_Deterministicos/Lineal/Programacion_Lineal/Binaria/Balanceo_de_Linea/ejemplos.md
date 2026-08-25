@@ -66,8 +66,6 @@ El modelo selecciona exactamente una arista por tarea (restricción R2) y minimi
 
 ## Caso 1 — Modelo Base
 
-**Archivo:** [`caso_simple.py`](./caso_simple.py)
-
 Implementa R1 (cota minimax), R2 (asignación única con `sum() == 1`) y R3 (precedencia).
 
 ### Restricciones desplegadas
@@ -140,11 +138,17 @@ graph TB
 | Sobreyectividad | Toda estación recibe al menos una tarea |
 | ¿Es un matching? | No. En un matching clásico cada nodo aparece a lo sumo una vez. Aquí las estaciones reciben varias tareas: es una **partición** del conjunto $I$ en $m = 2$ subconjuntos disjuntos no vacíos. |
 
+### Código del solver
+
+```python
+--8<-- "backend/solvers/balanceo_de_linea.py:resolver"
+```
+
 ### Salida del programa
 
 ```
 ==================================================
-  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (SIMPLE)
+  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (BASE)
 ==================================================
   Tiempo de ciclo óptimo C* = 80 s
   Tasa de producción        = 45.0 kits/hora
@@ -164,9 +168,7 @@ graph TB
 
 ## Caso 2 — Restricciones Adicionales
 
-**Archivo:** [`caso_extendido.py`](./caso_extendido.py)
-
-Extiende el caso simple con R4 (incompatibilidad) y R5 (espacio físico). Usa `add_exactly_one` en lugar de `sum() == 1`.
+Extiende el caso base con R4 (incompatibilidad) y R5 (espacio físico). Usa `add_exactly_one` en lugar de `sum() == 1`.
 
 ### Restricciones adicionales desplegadas
 
@@ -241,14 +243,4 @@ La incompatibilidad entre Etiquetado y Cupón fuerza su separación, elevando el
     Tareas   : ['Cupón', 'Sellado']
     Tiempo   : 55 s  (ocio: 35 s)
     Espacio  : 5 m² / 8 m²
-```
-
----
-
-## Cómo ejecutar
-
-```bash
-pip install ortools
-python caso_simple.py
-python caso_extendido.py
 ```

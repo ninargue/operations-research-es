@@ -10,6 +10,7 @@ Dependencia: pip install ortools
 from ortools.sat.python import cp_model
 
 
+# --8<-- [start:resolver]
 def resolver(
     tiempos: list[int],
     nombres: list[str],
@@ -102,6 +103,7 @@ def resolver(
         resultado["eficiencia"] = round(eficiencia, 1)
 
     return resultado
+# --8<-- [end:resolver]
 
 
 if __name__ == "__main__":

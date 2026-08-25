@@ -66,8 +66,6 @@ El modelo selecciona exactamente una arista por tarea (restricción R2) y minimi
 
 ## Caso 1 — Modelo Base
 
-**Archivo:** [`caso_simple.py`](./caso_simple.py)
-
 Implementa R1 (cota minimax), R2 (asignación única con `sum() == 1`) y R3 (precedencia).
 
 ### Restricciones desplegadas
@@ -140,33 +138,31 @@ graph TB
 | Sobreyectividad | Toda estación recibe al menos una tarea |
 | ¿Es un matching? | No. En un matching clásico cada nodo aparece a lo sumo una vez. Aquí las estaciones reciben varias tareas: es una **partición** del conjunto $I$ en $m = 2$ subconjuntos disjuntos no vacíos. |
 
-### Salida del programa
+### Código del solver
 
+```python
+--8<-- "backend/solvers/balanceo_de_linea.py:resolver"
 ```
-==================================================
-  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (SIMPLE)
-==================================================
-  Tiempo de ciclo óptimo C* = 80 s
-  Tasa de producción        = 45.0 kits/hora
 
-  Estación 1:
-    Tareas   : ['Inspección', 'Etiquetado', 'Cupón']
-    Tiempo   : 65 s
-    Ocio     : 15 s
+### Respuesta de la API
 
-  Estación 2:
-    Tareas   : ['Empaquetado', 'Sellado']
-    Tiempo   : 80 s
-    Ocio     : 0 s
+```json
+{
+  "status": "OPTIMAL",
+  "ciclo_optimo": 80,
+  "tasa_produccion": 45.0,
+  "estaciones": [
+    {"numero": 1, "tareas": ["Inspección", "Etiquetado", "Cupón"], "tiempo": 65, "ocio": 15},
+    {"numero": 2, "tareas": ["Empaquetado", "Sellado"], "tiempo": 80, "ocio": 0}
+  ]
+}
 ```
 
 ---
 
 ## Caso 2 — Restricciones Adicionales
 
-**Archivo:** [`caso_extendido.py`](./caso_extendido.py)
-
-Extiende el caso simple con R4 (incompatibilidad) y R5 (espacio físico). Usa `add_exactly_one` en lugar de `sum() == 1`.
+Extiende el caso base con R4 (incompatibilidad) y R5 (espacio físico). Usa `add_exactly_one` en lugar de `sum() == 1`.
 
 ### Restricciones adicionales desplegadas
 
@@ -222,33 +218,17 @@ $$C^* = 90 \text{ s} \quad \Rightarrow \quad 40 \text{ kits/hora}$$
 
 La incompatibilidad entre Etiquetado y Cupón fuerza su separación, elevando el cuello de botella de 80 s a 90 s.
 
-### Salida del programa
+### Respuesta de la API
 
-```
-=======================================================
-  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (EXTENDIDO)
-=======================================================
-  Tiempo de ciclo C*     = 90 s
-  Tasa de producción     = 40.0 kits/hora
-  Eficiencia de la línea = 80.6%
-
-  Estación 1:
-    Tareas   : ['Inspección', 'Etiquetado', 'Empaquetado']
-    Tiempo   : 90 s  (ocio: 0 s)
-    Espacio  : 6 m² / 8 m²
-
-  Estación 2:
-    Tareas   : ['Cupón', 'Sellado']
-    Tiempo   : 55 s  (ocio: 35 s)
-    Espacio  : 5 m² / 8 m²
-```
-
----
-
-## Cómo ejecutar
-
-```bash
-pip install ortools
-python caso_simple.py
-python caso_extendido.py
+```json
+{
+  "status": "OPTIMAL",
+  "ciclo_optimo": 90,
+  "tasa_produccion": 40.0,
+  "eficiencia": 80.6,
+  "estaciones": [
+    {"numero": 1, "tareas": ["Inspección", "Etiquetado", "Empaquetado"], "tiempo": 90, "ocio": 0, "espacio": 6},
+    {"numero": 2, "tareas": ["Cupón", "Sellado"], "tiempo": 55, "ocio": 35, "espacio": 5}
+  ]
+}
 ```

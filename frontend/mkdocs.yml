@@ -55,6 +55,8 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.details
+  - pymdownx.snippets:
+      base_path: [".."]
 
 extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js

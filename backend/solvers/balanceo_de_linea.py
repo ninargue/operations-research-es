@@ -7,10 +7,10 @@ Solución esperada caso base: C* = 80 segundos.
 Dependencia: pip install ortools
 """
 
+# --8<-- [start:resolver]
 from ortools.sat.python import cp_model
 
 
-# --8<-- [start:resolver]
 def resolver(
     tiempos: list[int],
     nombres: list[str],

@@ -244,3 +244,83 @@ La incompatibilidad entre Etiquetado y Cupón fuerza su separación, elevando el
     Tiempo   : 55 s  (ocio: 35 s)
     Espacio  : 5 m² / 8 m²
 ```
+
+---
+
+## Demo interactivo
+
+Prueba el solver directamente. Los valores están pre-cargados con el caso base — puedes modificarlos y ejecutar.
+
+<div id="demo-balanceo" style="font-family: inherit;">
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Tiempos (s), separados por coma</label><br>
+    <input id="bl-tiempos" type="text" value="30, 15, 45, 20, 35"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px; font-family:monospace;">
+  </div>
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Nombres de tareas, separados por coma</label><br>
+    <input id="bl-nombres" type="text" value="Inspección, Etiquetado, Empaquetado, Cupón, Sellado"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px; font-family:monospace;">
+  </div>
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Número de estaciones</label><br>
+    <input id="bl-estaciones" type="number" value="2" min="1"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px;">
+  </div>
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Precedencias (pares i,j separados por | )</label><br>
+    <input id="bl-precedencias" type="text" value="0,1 | 1,2 | 1,3 | 2,4 | 3,4"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px; font-family:monospace;">
+  </div>
+</div>
+
+<button onclick="resolverBalanceo()"
+  style="background:#3f51b5; color:#fff; border:none; padding:.5rem 1.4rem; border-radius:4px; cursor:pointer; font-size:.95rem;">
+  Resolver
+</button>
+
+<pre id="bl-resultado"
+  style="margin-top:1rem; padding:1rem; background:var(--md-code-bg-color, #f5f5f5);
+         border-radius:4px; font-family:monospace; font-size:.85rem; white-space:pre-wrap; display:none;"></pre>
+
+</div>
+
+<script>
+function resolverBalanceo() {
+  const tiempos = document.getElementById('bl-tiempos').value
+    .split(',').map(v => parseInt(v.trim())).filter(v => !isNaN(v));
+  const nombres = document.getElementById('bl-nombres').value
+    .split(',').map(v => v.trim());
+  const numEstaciones = parseInt(document.getElementById('bl-estaciones').value);
+  const precedencias = document.getElementById('bl-precedencias').value
+    .split('|').map(p => p.trim().split(',').map(v => parseInt(v.trim())))
+    .filter(p => p.length === 2 && !isNaN(p[0]) && !isNaN(p[1]));
+
+  const pre = document.getElementById('bl-resultado');
+  pre.style.display = 'block';
+  pre.textContent = 'Resolviendo…';
+
+  fetch('https://operations-research-es.vercel.app/balanceo-linea', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tiempos, nombres, num_estaciones: numEstaciones, precedencias })
+  })
+  .then(r => r.json())
+  .then(data => {
+    let out = `Status: ${data.status}\n`;
+    out += `Ciclo óptimo C* = ${data.ciclo_optimo} s\n`;
+    out += `Tasa de producción = ${data.tasa_produccion} kits/hora\n`;
+    if (data.eficiencia) out += `Eficiencia = ${data.eficiencia}%\n`;
+    out += '\n';
+    data.estaciones.forEach(e => {
+      out += `Estación ${e.numero}: ${e.tareas.join(', ')}\n`;
+      out += `  Tiempo: ${e.tiempo} s  |  Ocio: ${e.ocio} s\n`;
+      if (e.espacio !== undefined) out += `  Espacio: ${e.espacio} m²\n`;
+    });
+    pre.textContent = out;
+  })
+  .catch(err => { pre.textContent = `Error: ${err.message}`; });
+}
+</script>

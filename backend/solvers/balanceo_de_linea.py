@@ -113,4 +113,13 @@ if __name__ == "__main__":
         num_estaciones=2,
         precedencias=[(0, 1), (1, 2), (1, 3), (2, 4), (3, 4)],
     )
-    print(resultado)
+    print("==================================================")
+    print("  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (BASE)")
+    print("==================================================")
+    print(f"  Tiempo de ciclo óptimo C* = {resultado['ciclo_optimo']} s")
+    print(f"  Tasa de producción        = {resultado['tasa_produccion']} kits/hora")
+    for est in resultado["estaciones"]:
+        print(f"\n  Estación {est['numero']}:")
+        print(f"    Tareas   : {est['tareas']}")
+        print(f"    Tiempo   : {est['tiempo']} s")
+        print(f"    Ocio     : {est['ocio']} s")

@@ -144,18 +144,24 @@ graph TB
 --8<-- "backend/solvers/balanceo_de_linea.py:resolver"
 ```
 
-### Respuesta de la API
+### Salida del programa
 
-```json
-{
-  "status": "OPTIMAL",
-  "ciclo_optimo": 80,
-  "tasa_produccion": 45.0,
-  "estaciones": [
-    {"numero": 1, "tareas": ["Inspección", "Etiquetado", "Cupón"], "tiempo": 65, "ocio": 15},
-    {"numero": 2, "tareas": ["Empaquetado", "Sellado"], "tiempo": 80, "ocio": 0}
-  ]
-}
+```
+==================================================
+  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (BASE)
+==================================================
+  Tiempo de ciclo óptimo C* = 80 s
+  Tasa de producción        = 45.0 kits/hora
+
+  Estación 1:
+    Tareas   : ['Inspección', 'Etiquetado', 'Cupón']
+    Tiempo   : 65 s
+    Ocio     : 15 s
+
+  Estación 2:
+    Tareas   : ['Empaquetado', 'Sellado']
+    Tiempo   : 80 s
+    Ocio     : 0 s
 ```
 
 ---
@@ -218,17 +224,23 @@ $$C^* = 90 \text{ s} \quad \Rightarrow \quad 40 \text{ kits/hora}$$
 
 La incompatibilidad entre Etiquetado y Cupón fuerza su separación, elevando el cuello de botella de 80 s a 90 s.
 
-### Respuesta de la API
+### Salida del programa
 
-```json
-{
-  "status": "OPTIMAL",
-  "ciclo_optimo": 90,
-  "tasa_produccion": 40.0,
-  "eficiencia": 80.6,
-  "estaciones": [
-    {"numero": 1, "tareas": ["Inspección", "Etiquetado", "Empaquetado"], "tiempo": 90, "ocio": 0, "espacio": 6},
-    {"numero": 2, "tareas": ["Cupón", "Sellado"], "tiempo": 55, "ocio": 35, "espacio": 5}
-  ]
-}
+```
+=======================================================
+  SOLUCIÓN ÓPTIMA — BALANCEO DE LÍNEA (EXTENDIDO)
+=======================================================
+  Tiempo de ciclo C*     = 90 s
+  Tasa de producción     = 40.0 kits/hora
+  Eficiencia de la línea = 80.6%
+
+  Estación 1:
+    Tareas   : ['Inspección', 'Etiquetado', 'Empaquetado']
+    Tiempo   : 90 s  (ocio: 0 s)
+    Espacio  : 6 m² / 8 m²
+
+  Estación 2:
+    Tareas   : ['Cupón', 'Sellado']
+    Tiempo   : 55 s  (ocio: 35 s)
+    Espacio  : 5 m² / 8 m²
 ```

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "frontend/**"
   workflow_dispatch:
 
 permissions:
@@ -28,14 +30,16 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements-docs.txt
+        working-directory: frontend
 
       - name: Build site
         run: mkdocs build
+        working-directory: frontend
 
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site/
+          path: frontend/site/
 
   deploy:
     needs: build

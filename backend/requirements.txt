@@ -1,3 +1,6 @@
+ortools
+fastapi
+uvicorn[standard]
 numpy
 pandas
 scipy
@@ -5,6 +8,3 @@ matplotlib
 pulp
 networkx
 simpy
-jupyter
-fastapi
-uvicorn

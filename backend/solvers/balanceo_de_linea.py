@@ -73,7 +73,7 @@ def resolver(
     status = solver.solve(model)
 
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
-        return {"status": "INFEASIBLE"}
+        return {"status": solver.status_name(status)}
 
     ciclo = solver.value(C)
     estaciones = []
@@ -91,7 +91,7 @@ def resolver(
         estaciones.append(estacion)
 
     resultado = {
-        "status": "OPTIMAL",
+        "status": solver.status_name(status),
         "ciclo_optimo": ciclo,
         "tasa_produccion": round(3600 / ciclo, 1),
         "estaciones": estaciones,

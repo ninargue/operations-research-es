@@ -63,13 +63,6 @@ graph LR
     H --> PHEUR["Prog. Heurística"]
     H --> PD["Prog. Dinámica"]
 
-    PD --> FDP["Fundamentos DP"]
-    PD --> MO["Mochila 0/1"]
-    PD --> CM["Cambio de Monedas"]
-    PD --> LCS["LCS"]
-    PD --> ED["Edit Distance"]
-    PD --> FW["Floyd-Warshall"]
-
     click D "https://github.com/ninargue/operations-research-es/tree/main/1_Deterministicos" "Ver Modelos Determinísticos"
     click E "https://github.com/ninargue/operations-research-es/tree/main/2_Estocasticos" "Ver Modelos Estocásticos"
     click H "https://github.com/ninargue/operations-research-es/tree/main/3_Hibridos" "Ver Modelos Híbridos"

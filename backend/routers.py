@@ -1,5 +1,7 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+import os
+import resend
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, EmailStr
 from solvers import balanceo_de_linea
 
 router = APIRouter()
@@ -17,6 +19,33 @@ class BalanceoInput(BaseModel):
     incompatibilidades: list[tuple[int, int]] | None = None
     limite_espacio: list[int] | None = None
     espacio: list[int] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Contacto
+# ---------------------------------------------------------------------------
+
+class ContactoInput(BaseModel):
+    nombre: str
+    email: EmailStr
+    mensaje: str
+
+
+@router.post("/contacto", tags=["Contacto"])
+def contacto(data: ContactoInput):
+    api_key = os.environ.get("RESEND_API_KEY")
+    dest = os.environ.get("CONTACT_EMAIL")
+    if not api_key or not dest:
+        raise HTTPException(status_code=503, detail="Servicio de contacto no configurado")
+    resend.api_key = api_key
+    resend.Emails.send({
+        "from": "contacto@resend.dev",
+        "reply_to": data.email,
+        "to": dest,
+        "subject": f"Mensaje de {data.nombre} — Operations Research ES",
+        "text": f"Nombre: {data.nombre}\nEmail: {data.email}\n\n{data.mensaje}",
+    })
+    return {"ok": True}
 
 
 @router.post("/balanceo-linea", tags=["Balanceo de Línea"])

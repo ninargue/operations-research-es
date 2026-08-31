@@ -66,6 +66,9 @@ graph LR
     click D "https://github.com/ninargue/operations-research-es/tree/main/1_Deterministicos" "Ver Modelos Determinísticos"
     click E "https://github.com/ninargue/operations-research-es/tree/main/2_Estocasticos" "Ver Modelos Estocásticos"
     click H "https://github.com/ninargue/operations-research-es/tree/main/3_Hibridos" "Ver Modelos Híbridos"
+    click DL "1_Deterministicos/" "Determinísticos"
+    click PL "1_Deterministicos/Lineal/Programacion_Lineal/Binaria/" "Programación Lineal"
+    click PB "1_Deterministicos/Lineal/Programacion_Lineal/Binaria/" "Programación Lineal Binaria"
 
     style ROOT fill:#1e3a5f,color:#fff,stroke:#1e3a5f
     style D fill:#7b5ea7,color:#fff,stroke:#7b5ea7

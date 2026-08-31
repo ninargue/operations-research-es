@@ -1,5 +1,8 @@
 ---
 description: Referencia técnica de Investigación de Operaciones en español — modelos matemáticos, código Python con OR-Tools y demos interactivos por sector.
+meta:
+  - name: google-site-verification
+    content: -mqCNmojMkdbB5W4osHE2CGJ2sWmIE02_vOgKnY6_8U
 ---
 
 <p align="center">

@@ -1,7 +1,7 @@
 import os
 import resend
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from solvers import balanceo_de_linea
 
 router = APIRouter()
@@ -27,7 +27,7 @@ class BalanceoInput(BaseModel):
 
 class ContactoInput(BaseModel):
     nombre: str
-    email: EmailStr
+    email: str
     mensaje: str
 
 

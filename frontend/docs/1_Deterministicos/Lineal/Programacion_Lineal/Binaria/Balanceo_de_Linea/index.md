@@ -1,3 +1,7 @@
+---
+description: Balanceo de Línea de Ensamblaje — minimización del cuello de botella (Minimax) con Python y OR-Tools CP-SAT. Incluye código, formulación y demo interactivo.
+---
+
 # Balanceo de Línea de Ensamblaje
 
 Minimización de cuello de botella (problema Minimax) aplicado a una línea de ensamblaje logística.  

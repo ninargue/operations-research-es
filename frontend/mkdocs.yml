@@ -38,6 +38,7 @@ theme:
 plugins:
   - search:
       lang: es
+  - meta
 
 markdown_extensions:
   - admonition

@@ -1,3 +1,7 @@
+---
+description: Referencia técnica de Investigación de Operaciones en español — modelos matemáticos, código Python con OR-Tools y demos interactivos por sector.
+---
+
 <p align="center">
   <img src="./banner.svg" alt="Operations Research en Español" width="100%"/>
 </p>

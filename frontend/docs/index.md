@@ -1,3 +1,10 @@
+---
+description: Referencia técnica de Investigación de Operaciones en español — modelos matemáticos, código Python con OR-Tools y demos interactivos por sector.
+meta:
+  - name: google-site-verification
+    content: -mqCNmojMkdbB5W4osHE2CGJ2sWmIE02_vOgKnY6_8U
+---
+
 <p align="center">
   <img src="./banner.svg" alt="Operations Research en Español" width="100%"/>
 </p>
@@ -63,16 +70,12 @@ graph LR
     H --> PHEUR["Prog. Heurística"]
     H --> PD["Prog. Dinámica"]
 
-    PD --> FDP["Fundamentos DP"]
-    PD --> MO["Mochila 0/1"]
-    PD --> CM["Cambio de Monedas"]
-    PD --> LCS["LCS"]
-    PD --> ED["Edit Distance"]
-    PD --> FW["Floyd-Warshall"]
-
     click D "https://github.com/ninargue/operations-research-es/tree/main/1_Deterministicos" "Ver Modelos Determinísticos"
     click E "https://github.com/ninargue/operations-research-es/tree/main/2_Estocasticos" "Ver Modelos Estocásticos"
     click H "https://github.com/ninargue/operations-research-es/tree/main/3_Hibridos" "Ver Modelos Híbridos"
+    click DL "1_Deterministicos/" "Determinísticos"
+    click PL "1_Deterministicos/Lineal/Programacion_Lineal/Binaria/" "Programación Lineal"
+    click PB "1_Deterministicos/Lineal/Programacion_Lineal/Binaria/" "Programación Lineal Binaria"
 
     style ROOT fill:#1e3a5f,color:#fff,stroke:#1e3a5f
     style D fill:#7b5ea7,color:#fff,stroke:#7b5ea7
@@ -126,12 +129,79 @@ Los modelos de este repositorio tienen aplicación directa en:
 
 ---
 
-## 🤝 ¿Necesitas ayuda con alguno de estos modelos?
+## 🤝 ¿Necesitas ayuda con alguno de estas soluciones?
 
-Si tu organización enfrenta un problema de optimización, simulación, toma de decisiones o planificación, puedes contactarme:
+Si te interesa ahondar sobre problemas de optimización, simulación, toma de decisiones o planificación, escríbenos:
 
-- 📧 **Email:** `[tu@email.com]`
-- 💼 **LinkedIn:** *(agregar enlace)*
+<div id="contacto-form">
+<div style="display:grid; gap:.75rem; max-width:480px;">
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Nombre</label><br>
+    <input id="c-nombre" type="text" placeholder="Tu nombre"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px;">
+  </div>
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Email</label><br>
+    <input id="c-email" type="email" placeholder="tu@email.com"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px;">
+  </div>
+  <div>
+    <label style="font-size:.85rem; font-weight:600;">Mensaje</label><br>
+    <textarea id="c-mensaje" rows="4" placeholder="¿En qué podemos ayudarte?"
+      style="width:100%; padding:.4rem .6rem; border:1px solid #ccc; border-radius:4px; font-family:inherit; resize:vertical;"></textarea>
+  </div>
+  <div>
+    <button onclick="enviarContacto()"
+      style="background:#3f51b5; color:#fff; border:none; padding:.5rem 1.4rem; border-radius:4px; cursor:pointer; font-size:.95rem;">
+      Enviar mensaje
+    </button>
+    <span id="c-status" style="margin-left:.8rem; font-size:.85rem;"></span>
+  </div>
+</div>
+</div>
+
+<script>
+function enviarContacto() {
+  const nombre = document.getElementById('c-nombre').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const mensaje = document.getElementById('c-mensaje').value.trim();
+  const status = document.getElementById('c-status');
+
+  if (!nombre || !email || !mensaje) {
+    status.textContent = 'Por favor completa todos los campos.';
+    status.style.color = '#c00';
+    return;
+  }
+
+  status.textContent = 'Enviando…';
+  status.style.color = '';
+
+  fetch('https://operations-research-es.vercel.app/contacto', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre, email, mensaje })
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('Error del servidor');
+    return r.json();
+  })
+  .then(() => {
+    status.textContent = '¡Mensaje enviado!';
+    status.style.color = '#2a7a2a';
+    document.getElementById('c-nombre').value = '';
+    document.getElementById('c-email').value = '';
+    document.getElementById('c-mensaje').value = '';
+  })
+  .catch(() => {
+    status.textContent = 'No se pudo enviar. Intenta de nuevo.';
+    status.style.color = '#c00';
+  });
+}
+</script>
+
+<br>
+
+- 💼 **[LinkedIn]()**
 - 🔗 **Demos disponibles:** Cada tema cuenta con una API de prueba para que puedas interactuar con el modelo directamente.
 
 ---

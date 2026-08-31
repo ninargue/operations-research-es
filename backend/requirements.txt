@@ -1,6 +1,7 @@
 ortools
 fastapi
 uvicorn[standard]
+resend
 numpy
 pandas
 scipy

@@ -4,6 +4,7 @@ site_url: https://ninargue.github.io/operations-research-es/
 repo_url: https://github.com/ninargue/operations-research-es
 repo_name: ninargue/operations-research-es
 
+
 docs_dir: docs
 site_dir: site
 
@@ -38,6 +39,7 @@ theme:
 plugins:
   - search:
       lang: es
+  - meta
 
 markdown_extensions:
   - admonition

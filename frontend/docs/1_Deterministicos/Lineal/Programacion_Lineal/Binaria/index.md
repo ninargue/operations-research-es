@@ -1,3 +1,7 @@
+---
+description: Programación Lineal Binaria en Python — variables de decisión 0/1, formulación matemática y casos de uso como balanceo de línea y asignación de recursos.
+---
+
 # Programación Lineal Binaria (PLB)
 
 La Programación Lineal Binaria es un caso especial de la Programación Entera donde **todas las variables de decisión son binarias**: solo pueden tomar los valores 0 o 1.

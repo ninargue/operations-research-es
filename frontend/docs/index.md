@@ -196,6 +196,8 @@ function enviarContacto() {
 }
 </script>
 
+<br>
+
 - 💼 **[LinkedIn]()**
 - 🔗 **Demos disponibles:** Cada tema cuenta con una API de prueba para que puedas interactuar con el modelo directamente.
 

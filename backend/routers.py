@@ -45,19 +45,22 @@ def _es_ofensivo(mensaje: str) -> bool:
     api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key:
         return False
-    client = anthropic.Anthropic(api_key=api_key)
-    resp = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=10,
-        messages=[{
-            "role": "user",
-            "content": (
-                "¿Es ofensivo, inapropiado o spam el siguiente mensaje? "
-                "Responde solo 'sí' o 'no'.\n\n" + mensaje
-            ),
-        }],
-    )
-    return resp.content[0].text.strip().lower().startswith("sí")
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=10,
+            messages=[{
+                "role": "user",
+                "content": (
+                    "¿Es ofensivo, inapropiado o spam el siguiente mensaje? "
+                    "Responde solo 'sí' o 'no'.\n\n" + mensaje
+                ),
+            }],
+        )
+        return resp.content[0].text.strip().lower().startswith("sí")
+    except Exception:
+        return False
 
 
 class ContactoInput(BaseModel):

@@ -39,7 +39,7 @@ def contacto(data: ContactoInput):
         raise HTTPException(status_code=503, detail="Servicio de contacto no configurado")
     resend.api_key = api_key
     resend.Emails.send({
-        "from": "contacto@resend.dev",
+        "from": "onboarding@resend.dev",
         "reply_to": data.email,
         "to": dest,
         "subject": f"Mensaje de {data.nombre} — Operations Research ES",

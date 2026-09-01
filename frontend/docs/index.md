@@ -130,6 +130,8 @@ Los modelos de este repositorio tienen aplicación directa en:
 
 Si te interesa ahondar sobre problemas de optimización, simulación, toma de decisiones o planificación, escríbenos:
 
+<script src="https://www.google.com/recaptcha/api.js?render=6Lf4GaQtAAAAAJUb5OTjSQZvF7XI9lfiaWxWIqpu"></script>
+
 <div id="contacto-form">
 <div style="display:grid; gap:.75rem; max-width:480px;">
   <div>
@@ -173,25 +175,30 @@ function enviarContacto() {
   status.textContent = 'Enviando…';
   status.style.color = '';
 
-  fetch('https://operations-research-es.vercel.app/contacto', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nombre, email, mensaje })
-  })
-  .then(r => {
-    if (!r.ok) throw new Error('Error del servidor');
-    return r.json();
-  })
-  .then(() => {
-    status.textContent = '¡Mensaje enviado!';
-    status.style.color = '#2a7a2a';
-    document.getElementById('c-nombre').value = '';
-    document.getElementById('c-email').value = '';
-    document.getElementById('c-mensaje').value = '';
-  })
-  .catch(() => {
-    status.textContent = 'No se pudo enviar. Intenta de nuevo.';
-    status.style.color = '#c00';
+  grecaptcha.ready(function() {
+    grecaptcha.execute('6Lf4GaQtAAAAAJUb5OTjSQZvF7XI9lfiaWxWIqpu', {action: 'contacto'})
+    .then(function(token) {
+      return fetch('https://operations-research-es.vercel.app/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, mensaje, recaptcha_token: token })
+      });
+    })
+    .then(r => {
+      if (!r.ok) throw new Error('Error del servidor');
+      return r.json();
+    })
+    .then(() => {
+      status.textContent = '¡Mensaje enviado!';
+      status.style.color = '#2a7a2a';
+      document.getElementById('c-nombre').value = '';
+      document.getElementById('c-email').value = '';
+      document.getElementById('c-mensaje').value = '';
+    })
+    .catch(() => {
+      status.textContent = 'No se pudo enviar. Intenta de nuevo.';
+      status.style.color = '#c00';
+    });
   });
 }
 </script>

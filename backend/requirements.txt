@@ -2,6 +2,7 @@ ortools
 fastapi
 uvicorn[standard]
 resend
+anthropic
 numpy
 pandas
 scipy
